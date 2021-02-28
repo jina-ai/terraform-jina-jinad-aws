@@ -69,6 +69,7 @@ with f:
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| additional\_tags | Additional resource tags | `map(string)` | `{}` | no |
 | instance\_name | Mention the name of the JinaD Instance | `string` | `"JinaD_EC2"` | no |
 | instance\_type | Mention the ec2 instance type for the JinaD instance | `string` | `"t2.micro"` | no |
 | region | Mention the Region where JinaD resources are going to get created | `string` | `"us-east-1"` | no |
