@@ -41,3 +41,10 @@ variable "subnet_cidr" {
   type        = string
   default     = "10.113.0.0/16"
 }
+
+
+variable "additional_tags" {
+  default     = {}
+  description = "Additional resource tags"
+  type        = map(string)
+}

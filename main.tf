@@ -87,14 +87,18 @@ resource "aws_instance" "jinad_instance" {
   vpc_security_group_ids = [aws_security_group.jinad_sg.id]
   subnet_id              = aws_subnet.jinad_vpc_subnet.id
   key_name               = module.keypair.key_name
-  tags = {
-    "Name" = var.instance_name
-  }
+  tags = merge(
+    var.additional_tags,
+    {
+      "Name" = var.instance_name
+    },
+  )
 }
 
 
 resource "aws_eip" "jinad_ip" {
-  vpc = true
+  vpc  = true
+  tags = var.additional_tags
 }
 
 
@@ -125,20 +129,24 @@ resource "null_resource" "setup_jinad" {
 
 resource "aws_vpc" "jinad_vpc" {
   cidr_block = var.vpc_cidr
+  tags       = var.additional_tags
 }
 
 
 resource "aws_internet_gateway" "jinad_ig" {
   vpc_id = aws_vpc.jinad_vpc.id
+  tags   = var.additional_tags
 }
 
 resource "aws_subnet" "jinad_vpc_subnet" {
   vpc_id     = aws_vpc.jinad_vpc.id
   cidr_block = var.subnet_cidr
+  tags       = var.additional_tags
 }
 
 resource "aws_security_group" "jinad_sg" {
   vpc_id = aws_vpc.jinad_vpc.id
+  tags   = var.additional_tags
 }
 
 resource "aws_security_group_rule" "jinad_sg_i_rule" {
@@ -169,6 +177,7 @@ resource "aws_route_table" "jinad_route_table" {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.jinad_ig.id
   }
+  tags = var.additional_tags
 }
 
 resource "aws_route_table_association" "jinad_route_association" {
