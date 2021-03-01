@@ -2,11 +2,14 @@
 
 ```hcl
 module "jinad" {
-   source         = "deepankarm/daemon-aws/jina"
+   source         = "jina-ai/jinad-aws/jina"
 
    instance_type  = "m4.large"
    vpc_cidr       = "34.121.0.0/24"
    subnet_cidr    = "34.121.0.0/28"
+   additional_tags = {
+     "my_tag_key" = "my_tag_value"
+   }
 }
 
 output "JINAD_IP" {
@@ -15,7 +18,7 @@ output "JINAD_IP" {
 }
 ```
 
-Store the output `JINAD_IP`
+Store the output `JINAD_IP` & Use it with `jina`
 
 ```python
 from jina.flow import Flow
