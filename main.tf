@@ -85,36 +85,44 @@ data "aws_ami" "ubuntu" {
 
 
 resource "aws_instance" "jinad_instance" {
+  for_each = var.jinad_ec2
+
   ami                    = data.aws_ami.ubuntu.id
-  instance_type          = var.instance_type
+  instance_type          = each.value.instance_type
   vpc_security_group_ids = [aws_security_group.jinad_sg.id]
   subnet_id              = aws_subnet.jinad_vpc_subnet.id
   key_name               = module.keypair.key_name
   tags = merge(
     var.additional_tags,
     {
-      "Name" = var.instance_name
+      "Name" = each.key
     },
   )
 }
 
 
 resource "aws_eip" "jinad_ip" {
+  for_each = var.jinad_ec2
+
   vpc  = true
   tags = var.additional_tags
 }
 
 
 resource "aws_eip_association" "jinad_ip_association" {
-  instance_id   = aws_instance.jinad_instance.id
-  allocation_id = aws_eip.jinad_ip.id
+  for_each = var.jinad_ec2
+
+  instance_id   = aws_instance.jinad_instance[each.key].id
+  allocation_id = aws_eip.jinad_ip[each.key].id 
 }
 
 
 resource "null_resource" "setup_jinad" {
+  for_each = var.jinad_ec2
+
   connection {
     type        = "ssh"
-    host        = aws_eip.jinad_ip.public_ip
+    host        = aws_eip.jinad_ip[each.key].public_ip
     user        = "ubuntu"
     private_key = module.keypair.private_key_pem
   }
