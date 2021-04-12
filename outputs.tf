@@ -1,6 +1,6 @@
 output "elastic_ip" {
   description = "Elastic IP of JinaD instance created"
-  value       = aws_eip.jinad_ip.public_ip
+  value       = { for jinad in sort(keys(var.jinad_ec2)) : jinad => aws_eip.jinad_ip[jinad].public_ip}
 }
 
 
