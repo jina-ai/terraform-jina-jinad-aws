@@ -7,23 +7,6 @@ variable "region" {
 }
 
 
-# variable "instance_type" {
-#   description = <<EOT
-#     Mention the ec2 instance type for the JinaD instance
-#     EOT
-#   type        = string
-#   default     = "t2.micro"
-# }
-
-
-# variable "instance_name" {
-#   description = <<EOT
-#     Mention the name of the JinaD Instance
-#     EOT
-#   type        = string
-#   default     = "JinaD_EC2"
-# }
-
 variable "jinad_ec2" {
   description = "Multiple instances(multiple pods) in one VPC.(Important to have all instances in one VPC)"
   type = map
