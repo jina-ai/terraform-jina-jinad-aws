@@ -88,7 +88,7 @@ resource "aws_instance" "jinad_instance" {
   for_each = var.jinad_ec2
 
   ami                    = data.aws_ami.ubuntu.id
-  instance_type          = each.value.instance_type
+  instance_type          = each.value.type
   vpc_security_group_ids = [aws_security_group.jinad_sg.id]
   subnet_id              = aws_subnet.jinad_vpc_subnet.id
   key_name               = module.keypair.key_name
@@ -132,7 +132,7 @@ resource "null_resource" "setup_jinad" {
       "curl -L https://raw.githubusercontent.com/jina-ai/cloud-ops/master/scripts/deb-systemd.sh > jinad-init.sh",
       "chmod +x jinad-init.sh",
       "sudo apt-get update",
-      "sudo bash jinad-init.sh"
+      "sudo bash jinad-init.sh ${join(" ", each.value.pip)}"
     ]
   }
 }

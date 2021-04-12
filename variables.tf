@@ -28,11 +28,18 @@ variable "jinad_ec2" {
   description = "Multiple instances(multiple pods) in one VPC.(Important to have all instances in one VPC)"
   type = map
   default = {
-    jinad_ec2_instance_1 = {
-      instance_type = "t2.large"
+    foo = {
+      type = "t2.large"
+      pip = [
+        "Pillow",
+        "transformers"
+      ]
     },
-    jinad_ec2_instance_2 = {
-      instance_type = "t2.micro"
+    bar = {
+      type = "t2.micro"
+      pip = [
+        "annoy",
+      ]
     },
   }
 }
