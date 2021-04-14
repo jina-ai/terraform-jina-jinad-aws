@@ -4,7 +4,20 @@
 module "jinad" {
    source         = "jina-ai/jinad-aws/jina"
 
-   instance_type  = "m4.large"
+   instances      = {
+     {
+       "encoder": {
+         "type": "c5.4xlarge",
+         "pip": [ "tensorflow>=2.0", "transformers>=2.6.0" ],
+         "command": "sudo apt install jq"
+       }
+       "indexer": {
+         "type": "i3.2xlarge",
+         "pip": [ "faiss-cpu==1.6.5", "redis==3.5.3" ],
+         "command": "sudo apt-get install -y redis-server && sudo redis-server --bind 0.0.0.0 --port 6379:6379 --daemonize yes"
+       }
+     }
+   }
    vpc_cidr       = "34.121.0.0/24"
    subnet_cidr    = "34.121.0.0/28"
    additional_tags = {
@@ -12,19 +25,23 @@ module "jinad" {
    }
 }
 
-output "JINAD_IP" {
+output "jinad_ips" {
    description   = "IP of JinaD"
-   value         = module.jinad.elastic_ip
+   value         = module.jinad.instance_ips
 }
 ```
 
-Store the output `JINAD_IP` & Use it with `jina`
+Store the outputs from `jinad_ips` & Use it with `jina`
 
 ```python
 from jina.flow import Flow
-f = Flow().add(uses='MyAdvancedEncoder',
-               host=JINAD_IP,
-               port_expose=8000)
+f = (Flow()
+     .add(uses='MyAdvancedEncoder',
+          host=jinad_ips.encoder,
+          port_expose=8000),
+     .add(uses='MyAdvancedIndexer',
+          host=jinad_ips.indexer,
+          port_expose=8000))
 
 with f:
    f.index(...)
@@ -73,8 +90,7 @@ with f:
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | additional\_tags | Additional resource tags | `map(string)` | `{}` | no |
-| instance\_name | Mention the name of the JinaD Instance | `string` | `"JinaD_EC2"` | no |
-| instance\_type | Mention the ec2 instance type for the JinaD instance | `string` | `"t2.micro"` | no |
+| instances | Describe instance configuration here. | `map(any)` | <pre>{<br>  "instance1": {<br>    "command": "sudo echo \"Hello from instance1\"",<br>    "pip": [<br>      "Pillow",<br>      "transformers"<br>    ],<br>    "type": "t2.micro"<br>  },<br>  "instance2": {<br>    "command": "sudo echo \"Hello from instance2\"",<br>    "pip": [<br>      "annoy"<br>    ],<br>    "type": "t2.micro"<br>  }<br>}</pre> | no |
 | region | Mention the Region where JinaD resources are going to get created | `string` | `"us-east-1"` | no |
 | subnet\_cidr | Mention the CIDR of the subnet | `string` | `"10.113.0.0/16"` | no |
 | vpc\_cidr | Mention the CIDR of the VPC | `string` | `"10.113.0.0/16"` | no |
@@ -83,5 +99,5 @@ with f:
 
 | Name | Description |
 |------|-------------|
-| elastic\_ip | Elastic IP of JinaD instance created |
-| private\_key\_pem | Private key of JinaD instance for debugging |
+| instance\_ips | Elastic IPs of JinaD instances created as a map |
+| instance\_keys | Private key of JinaD instance for debugging |

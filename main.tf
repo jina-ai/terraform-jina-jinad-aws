@@ -6,7 +6,20 @@
  * module "jinad" {
  *    source         = "jina-ai/jinad-aws/jina"
  *
- *    instance_type  = "m4.large"
+ *    instances      = {
+ *      {
+ *        "encoder": {
+ *          "type": "c5.4xlarge",
+ *          "pip": [ "tensorflow>=2.0", "transformers>=2.6.0" ],
+ *          "command": "sudo apt install jq"
+ *        }
+ *        "indexer": {
+ *          "type": "i3.2xlarge",
+ *          "pip": [ "faiss-cpu==1.6.5", "redis==3.5.3" ],
+ *          "command": "sudo apt-get install -y redis-server && sudo redis-server --bind 0.0.0.0 --port 6379:6379 --daemonize yes"
+ *        }
+ *      }
+ *    }
  *    vpc_cidr       = "34.121.0.0/24"
  *    subnet_cidr    = "34.121.0.0/28"
  *    additional_tags = {
@@ -14,19 +27,23 @@
  *    }
  * }
  *
- * output "JINAD_IP" {
+ * output "jinad_ips" {
  *    description   = "IP of JinaD"
- *    value         = module.jinad.elastic_ip
+ *    value         = module.jinad.instance_ips
  * }
  * ```
  *
- * Store the output `JINAD_IP` & Use it with `jina`
+ * Store the outputs from `jinad_ips` & Use it with `jina`
  *
  * ```python
  * from jina.flow import Flow
- * f = Flow().add(uses='MyAdvancedEncoder',
- *                host=JINAD_IP,
- *                port_expose=8000)
+ * f = (Flow()
+ *      .add(uses='MyAdvancedEncoder',
+ *           host=jinad_ips.encoder,
+ *           port_expose=8000),
+ *      .add(uses='MyAdvancedIndexer',
+ *           host=jinad_ips.indexer,
+ *           port_expose=8000))
  *
  * with f:
  *    f.index(...)
@@ -85,7 +102,7 @@ data "aws_ami" "ubuntu" {
 
 
 resource "aws_instance" "jinad_instance" {
-  for_each = var.jinad_ec2
+  for_each = var.instances
 
   ami                    = data.aws_ami.ubuntu.id
   instance_type          = each.value.type
@@ -102,7 +119,7 @@ resource "aws_instance" "jinad_instance" {
 
 
 resource "aws_eip" "jinad_ip" {
-  for_each = var.jinad_ec2
+  for_each = var.instances
 
   vpc  = true
   tags = var.additional_tags
@@ -110,15 +127,15 @@ resource "aws_eip" "jinad_ip" {
 
 
 resource "aws_eip_association" "jinad_ip_association" {
-  for_each = var.jinad_ec2
+  for_each = var.instances
 
   instance_id   = aws_instance.jinad_instance[each.key].id
-  allocation_id = aws_eip.jinad_ip[each.key].id 
+  allocation_id = aws_eip.jinad_ip[each.key].id
 }
 
 
 resource "null_resource" "setup_jinad" {
-  for_each = var.jinad_ec2
+  for_each = var.instances
 
   connection {
     type        = "ssh"
@@ -129,9 +146,10 @@ resource "null_resource" "setup_jinad" {
 
   provisioner "remote-exec" {
     inline = [
+      "sudo apt-get update",
+      each.value.command,
       "curl -L https://raw.githubusercontent.com/jina-ai/cloud-ops/master/scripts/deb-systemd.sh > jinad-init.sh",
       "chmod +x jinad-init.sh",
-      "sudo apt-get update",
       "sudo bash jinad-init.sh ${join(" ", each.value.pip)}"
     ]
   }
