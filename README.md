@@ -5,7 +5,6 @@ module "jinad" {
    source         = "jina-ai/jinad-aws/jina"
 
    instances      = {
-     {
        "encoder": {
          "type": "c5.4xlarge",
          "pip": [ "tensorflow>=2.0", "transformers>=2.6.0" ],
@@ -16,7 +15,6 @@ module "jinad" {
          "pip": [ "faiss-cpu==1.6.5", "redis==3.5.3" ],
          "command": "sudo apt-get install -y redis-server && sudo redis-server --bind 0.0.0.0 --port 6379:6379 --daemonize yes"
        }
-     }
    }
    vpc_cidr       = "34.121.0.0/24"
    subnet_cidr    = "34.121.0.0/28"
