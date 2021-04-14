@@ -7,22 +7,26 @@ variable "region" {
 }
 
 
-variable "jinad_ec2" {
-  description = "Multiple instances(multiple pods) in one VPC.(Important to have all instances in one VPC)"
-  type = map
+variable "instances" {
+  description = <<EOT
+    Describe instance configuration here.
+    EOT
+  type        = map(any)
   default = {
-    foo = {
-      type = "t2.large"
-      pip = [
+    "instance1" = {
+      "type" = "t2.micro"
+      "pip" = [
         "Pillow",
         "transformers"
-      ]
+      ],
+      "command" = "sudo echo \"Hello from instance1\""
     },
-    bar = {
-      type = "t2.micro"
-      pip = [
+    "instance2" = {
+      "type" = "t2.micro"
+      "pip" = [
         "annoy",
-      ]
+      ],
+      "command" = "sudo echo \"Hello from instance2\""
     },
   }
 }
@@ -49,6 +53,8 @@ variable "subnet_cidr" {
 
 variable "additional_tags" {
   default     = {}
-  description = "Additional resource tags"
+  description = <<EOT
+    Additional resource tags
+    EOT
   type        = map(string)
 }
