@@ -5,19 +5,17 @@
  * ```hcl
  * module "jinad" {
  *    source         = "jina-ai/jinad-aws/jina"
- *
+ *    version        = "v0.0.4"
  *    instances      = {
- *      {
- *        "encoder": {
- *          "type": "c5.4xlarge",
- *          "pip": [ "tensorflow>=2.0", "transformers>=2.6.0" ],
- *          "command": "sudo apt install jq"
- *        }
- *        "indexer": {
- *          "type": "i3.2xlarge",
- *          "pip": [ "faiss-cpu==1.6.5", "redis==3.5.3" ],
- *          "command": "sudo apt-get install -y redis-server && sudo redis-server --bind 0.0.0.0 --port 6379:6379 --daemonize yes"
- *        }
+ *      "encoder": {
+ *        "type": "c5.4xlarge",
+ *        "pip": [ "tensorflow>=2.0", "transformers>=2.6.0" ],
+ *        "command": "sudo apt install -y jq"
+ *      }
+ *      "indexer": {
+ *        "type": "i3.2xlarge",
+ *        "pip": [ "faiss-cpu==1.6.5", "redis==3.5.3" ],
+ *        "command": "sudo apt-get install -y redis-server && sudo redis-server --bind 0.0.0.0 --port 6379:6379 --daemonize yes"
  *      }
  *    }
  *    vpc_cidr       = "34.121.0.0/24"
@@ -36,14 +34,12 @@
  * Store the outputs from `jinad_ips` & Use it with `jina`
  *
  * ```python
- * from jina.flow import Flow
+ * from jina import Flow
  * f = (Flow()
- *      .add(uses='MyAdvancedEncoder',
- *           host=jinad_ips.encoder,
- *           port_expose=8000),
- *      .add(uses='MyAdvancedIndexer',
- *           host=jinad_ips.indexer,
- *           port_expose=8000))
+ *      .add(uses='MyAwesomeEncoder',
+ *           host=<jinad_ips.encoder>:8000),
+ *      .add(uses='MyAwesomeIndexer',
+ *           host=<jinad_ips.indexer>:8000))
  *
  * with f:
  *    f.index(...)
