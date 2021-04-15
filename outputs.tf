@@ -11,4 +11,5 @@ output "instance_keys" {
     Private key of JinaD instances for debugging
     EOT
   value       = module.keypair.private_key_pem
+  sensitive   = true
 }
