@@ -14,6 +14,14 @@ variable "availability_zone" {
   default     = "us-east-1a"
 }
 
+variable "device_name" {
+  description = <<EOT
+    Mention the device name of EBS which is attached to instance
+    EOT
+  type = string
+  default = "/dev/sdh"
+}
+
 variable "instances" {
   description = <<EOT
     Describe instance configuration here.

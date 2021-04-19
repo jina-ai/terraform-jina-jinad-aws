@@ -224,7 +224,7 @@ resource "aws_ebs_volume" "jinad_ebs_volume" {
 resource "aws_volume_attachment" "jinad_volume_attachment" {
   for_each = var.instances
 
-  device_name = "/dev/sdh"
+  device_name = var.device_name
   volume_id = aws_ebs_volume.jinad_ebs_volume[each.key].id
   instance_id = aws_instance.jinad_instance[each.key].id
 }
