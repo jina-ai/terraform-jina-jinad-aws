@@ -15,6 +15,10 @@ variable "instances" {
   default = {
     "instance1" = {
       "type" = "t2.micro"
+      "ebs" = {
+        type = "gp2"
+        size = "20"
+      }
       "pip" = [
         "Pillow",
         "transformers"
@@ -23,6 +27,10 @@ variable "instances" {
     },
     "instance2" = {
       "type" = "t2.micro"
+      "ebs" = {
+        type = "gp2"
+        size = "20"
+      }
       "pip" = [
         "annoy",
       ],
