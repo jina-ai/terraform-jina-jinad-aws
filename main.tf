@@ -209,3 +209,11 @@ resource "aws_route_table_association" "jinad_route_association" {
   subnet_id      = aws_subnet.jinad_vpc_subnet.id
   route_table_id = aws_route_table.jinad_route_table.id
 }
+
+resource "aws_ebs_volume" "jina_ebs_volume" {
+  for_each = var.instances
+
+  availability_zone = var.availability_zone
+  type = each.value.ebs.type
+  size = each.value.ebs.size
+}
