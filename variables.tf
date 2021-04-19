@@ -20,28 +20,28 @@ variable "instances" {
     EOT
   type        = map(any)
   default = {
-    "instance1" = {
-      "type" = "t2.micro"
-      "ebs" = {
+    instance1 = {
+      type = "t2.micro"
+      ebs = {
         type = "gp2"
         size = "20"
       }
-      "pip" = [
+      pip = [
         "Pillow",
         "transformers"
-      ],
-      "command" = "sudo echo \"Hello from instance1\""
-    },
-    "instance2" = {
-      "type" = "t2.micro"
-      "ebs" = {
+      ]
+      command = "sudo echo \"Hello from instance1\""
+    }
+    instance = {
+      type = "t2.micro"
+      ebs = {
         type = "gp2"
         size = "20"
       }
-      "pip" = [
+      pip = [
         "annoy",
-      ],
-      "command" = "sudo echo \"Hello from instance2\""
+      ]
+      command = "sudo echo \"Hello from instance2\""
     },
   }
 }
