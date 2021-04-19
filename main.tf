@@ -211,7 +211,7 @@ resource "aws_route_table_association" "jinad_route_association" {
   route_table_id = aws_route_table.jinad_route_table.id
 }
 
-resource "aws_ebs_volume" "jina_ebs_volume" {
+resource "aws_ebs_volume" "jinad_ebs_volume" {
   for_each = var.instances
 
   availability_zone = var.availability_zone
@@ -221,10 +221,10 @@ resource "aws_ebs_volume" "jina_ebs_volume" {
   tags = var.additional_tags
 }
 
-resource "aws_volume_attachment" "jina_volume_attachment" {
+resource "aws_volume_attachment" "jinad_volume_attachment" {
   for_each = var.instances
 
   device_name = "/dev/sdh"
-  volume_id = aws_ebs_volume.jina_ebs_volume[each.key].id
+  volume_id = aws_ebs_volume.jinad_ebs_volume[each.key].id
   instance_id = aws_instance.jinad_instance[each.key].id
 }
