@@ -164,6 +164,7 @@ resource "aws_internet_gateway" "jinad_ig" {
 }
 
 resource "aws_subnet" "jinad_vpc_subnet" {
+  availability_zone = var.availability_zone
   vpc_id     = aws_vpc.jinad_vpc.id
   cidr_block = var.subnet_cidr
   tags       = var.additional_tags
