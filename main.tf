@@ -217,6 +217,8 @@ resource "aws_ebs_volume" "jina_ebs_volume" {
   availability_zone = var.availability_zone
   type = each.value.ebs.type
   size = each.value.ebs.size
+
+  tags = var.additional_tags
 }
 
 resource "aws_volume_attachment" "jina_volume_attachment" {
