@@ -217,3 +217,11 @@ resource "aws_ebs_volume" "jina_ebs_volume" {
   type = each.value.ebs.type
   size = each.value.ebs.size
 }
+
+resource "aws_volume_attachment" "jina_volume_attachment" {
+  for_each = var.instances
+
+  device_name = "/dev/sdh"
+  volume_id = aws_ebs_volume.jina_ebs_volume[each.key].id
+  instance_id = aws_instance.jinad_instance[each.key].id
+}
