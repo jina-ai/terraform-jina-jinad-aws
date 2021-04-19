@@ -6,6 +6,13 @@ variable "region" {
   default     = "us-east-1"
 }
 
+variable "availability_zone" {
+  description = <<EOT
+    Mention the availability_zone where JinaD resources are going to get created
+    EOT
+  type        = string
+  default     = "us-east-1a"
+}
 
 variable "instances" {
   description = <<EOT
