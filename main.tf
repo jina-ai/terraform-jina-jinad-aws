@@ -143,6 +143,9 @@ resource "null_resource" "setup_jinad" {
   provisioner "remote-exec" {
     inline = [
       "sudo apt-get update",
+      "sudo mkdir ${var.ebs.mountLocation}",
+      "sudo mkfs -t ext4 ${var.device_name}",
+      "sudo mount ${var.device_name} ${var.ebs.mountLocation}",
       each.value.command,
       "curl -L https://raw.githubusercontent.com/jina-ai/cloud-ops/master/scripts/deb-systemd.sh > jinad-init.sh",
       "chmod +x jinad-init.sh",

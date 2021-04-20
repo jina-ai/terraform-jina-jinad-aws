@@ -22,6 +22,16 @@ variable "device_name" {
   default = "/dev/sdh"
 }
 
+variable "ebs" {
+  description = <<EOT
+    Mention the settings of EBS which is attached to instance
+    EOT
+  type = map(any)
+  default = {
+    mountLocation = "/mnt/data"
+  }
+}
+
 variable "instances" {
   description = <<EOT
     Describe instance configuration here.
@@ -40,7 +50,7 @@ variable "instances" {
       ]
       command = "sudo echo \"Hello from instance1\""
     }
-    instance = {
+    instance2 = {
       type = "t2.micro"
       ebs = {
         type = "gp2"
