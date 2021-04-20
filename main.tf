@@ -230,4 +230,5 @@ resource "aws_volume_attachment" "jinad_volume_attachment" {
   device_name = var.ebs.device_name
   volume_id = aws_ebs_volume.jinad_ebs_volume[each.key].id
   instance_id = aws_instance.jinad_instance[each.key].id
+  force_detach = true
 }
