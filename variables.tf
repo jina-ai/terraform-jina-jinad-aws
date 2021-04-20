@@ -29,6 +29,7 @@ variable "ebs" {
   type = map(any)
   default = {
     device_name = "/dev/sdh"
+    device_name_renamed = "/dev/xvdh"
     mountLocation = "/mnt/data"
   }
 }
