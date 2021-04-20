@@ -58,8 +58,6 @@ variable "instances" {
   }
 }
 
-
-
 variable "vpc_cidr" {
   description = <<EOT
     Mention the CIDR of the VPC
@@ -68,7 +66,6 @@ variable "vpc_cidr" {
   default     = "10.113.0.0/16"
 }
 
-
 variable "subnet_cidr" {
   description = <<EOT
     Mention the CIDR of the subnet
@@ -76,7 +73,6 @@ variable "subnet_cidr" {
   type        = string
   default     = "10.113.0.0/16"
 }
-
 
 variable "additional_tags" {
   default     = {}
