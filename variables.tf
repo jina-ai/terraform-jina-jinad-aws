@@ -28,6 +28,7 @@ variable "ebs" {
     EOT
   type = map(any)
   default = {
+    device_name = "/dev/sdh"
     mountLocation = "/mnt/data"
   }
 }

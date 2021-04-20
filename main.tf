@@ -144,8 +144,8 @@ resource "null_resource" "setup_jinad" {
     inline = [
       "sudo apt-get update",
       "sudo mkdir ${var.ebs.mountLocation}",
-      "sudo mkfs -t ext4 ${var.device_name}",
-      "sudo mount ${var.device_name} ${var.ebs.mountLocation}",
+      "sudo mkfs -t ext4 ${var.ebs.device_name}",
+      "sudo mount ${var.ebs.device_name} ${var.ebs.mountLocation}",
       each.value.command,
       "curl -L https://raw.githubusercontent.com/jina-ai/cloud-ops/master/scripts/deb-systemd.sh > jinad-init.sh",
       "chmod +x jinad-init.sh",
@@ -227,7 +227,7 @@ resource "aws_ebs_volume" "jinad_ebs_volume" {
 resource "aws_volume_attachment" "jinad_volume_attachment" {
   for_each = var.instances
 
-  device_name = var.device_name
+  device_name = var.ebs.device_name
   volume_id = aws_ebs_volume.jinad_ebs_volume[each.key].id
   instance_id = aws_instance.jinad_instance[each.key].id
 }
