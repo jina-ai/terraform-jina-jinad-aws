@@ -147,7 +147,7 @@ resource "null_resource" "setup_jinad" {
       "sudo mkfs -t ext4 ${var.ebs.device_name_renamed}",
       "sudo mount ${var.ebs.device_name_renamed} ${var.ebs.mountLocation}",
       each.value.command,
-      "ln -s /mnt/data/ /usr/local/jina/",
+      "ln -s /mnt/data/ /usr/local/jina",
       "curl -L https://raw.githubusercontent.com/jina-ai/cloud-ops/master/scripts/deb-systemd.sh > jinad-init.sh",
       "chmod +x jinad-init.sh",
       "sudo bash jinad-init.sh ${join(" ", each.value.pip)}"
