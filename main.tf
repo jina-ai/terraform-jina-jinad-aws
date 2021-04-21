@@ -9,7 +9,7 @@
  *    instances      = {
  *      encoder: {
  *        type: "c5.4xlarge"
- *        ebs = {
+ *        disk = {
  *          type = "gp2"
  *          size = "20"
  *        }
@@ -18,7 +18,7 @@
  *      }
  *      indexer: {
  *        type: "i3.2xlarge"
- *        ebs = {
+ *        disk = {
  *          type = "gp2"
  *          size = "20"
  *        }
