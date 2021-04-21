@@ -6,22 +6,24 @@
  * module "jinad" {
  *    source         = "jina-ai/jinad-aws/jina"
  *    version        = "0.0.5"
- *    ebs = {
- *      device_name = "/dev/sdh"
- *      device_name_renamed = "/dev/xvdh"
- *      mount_location = "/mnt/data"
- *      jina_home = "/usr/local/jina"
- *      }
  *    instances      = {
- *      "encoder": {
- *        "type": "c5.4xlarge",
- *        "pip": [ "tensorflow>=2.0", "transformers>=2.6.0" ],
- *        "command": "sudo apt install -y jq"
+ *      encoder: {
+ *        type: "c5.4xlarge"
+ *        ebs = {
+ *          type = "gp2"
+ *          size = "20"
+ *        }
+ *        pip: [ "tensorflow>=2.0", "transformers>=2.6.0" ]
+ *        command: "sudo apt install -y jq"
  *      }
- *      "indexer": {
- *        "type": "i3.2xlarge",
- *        "pip": [ "faiss-cpu==1.6.5", "redis==3.5.3" ],
- *        "command": "sudo apt-get install -y redis-server && sudo redis-server --bind 0.0.0.0 --port 6379:6379 --daemonize yes"
+ *      indexer: {
+ *        type: "i3.2xlarge"
+ *        ebs = {
+ *          type = "gp2"
+ *          size = "20"
+ *        }
+ *        pip: [ "faiss-cpu==1.6.5", "redis==3.5.3" ]
+ *        command: "sudo apt-get install -y redis-server && sudo redis-server --bind 0.0.0.0 --port 6379:6379 --daemonize yes"
  *      }
  *    }
  *    vpc_cidr       = "34.121.0.0/24"
