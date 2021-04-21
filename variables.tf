@@ -23,6 +23,7 @@ variable "ebs" {
     device_name = "/dev/sdh"
     device_name_renamed = "/dev/xvdh"
     mount_location = "/mnt/data"
+    jina_home = "/usr/local/jina"
   }
 }
 
