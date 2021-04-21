@@ -22,7 +22,7 @@ variable "ebs" {
   default = {
     device_name = "/dev/sdh"
     device_name_renamed = "/dev/xvdh"
-    mountLocation = "/mnt/data"
+    mount_location = "/mnt/data"
   }
 }
 
