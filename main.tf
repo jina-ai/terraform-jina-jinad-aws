@@ -151,10 +151,10 @@ resource "null_resource" "setup_jinad" {
   provisioner "remote-exec" {
     inline = [
       "sudo apt-get update",
-      "sudo mkdir ${var.ebs.mount_location}",
-      "sudo mkfs -t ext4 ${var.ebs.device_name_renamed}",
-      "sudo mount ${var.ebs.device_name_renamed} ${var.ebs.mount_location}",
-      "sudo ln -s ${var.ebs.mount_location} ${var.ebs.jina_home}",
+      "sudo mkdir ${var.disk.mount_location}",
+      "sudo mkfs -t ext4 ${var.disk.device_name_renamed}",
+      "sudo mount ${var.disk.device_name_renamed} ${var.disk.mount_location}",
+      "sudo ln -s ${var.disk.mount_location} ${var.disk.jina_home}",
       each.value.command,
       "curl -L https://raw.githubusercontent.com/jina-ai/cloud-ops/master/scripts/deb-systemd.sh > jinad-init.sh",
       "chmod +x jinad-init.sh",
@@ -236,7 +236,7 @@ resource "aws_ebs_volume" "jinad_ebs_volume" {
 resource "aws_volume_attachment" "jinad_volume_attachment" {
   for_each = var.instances
 
-  device_name = var.ebs.device_name
+  device_name = var.disk.device_name
   volume_id = aws_ebs_volume.jinad_ebs_volume[each.key].id
   instance_id = aws_instance.jinad_instance[each.key].id
   force_detach = true

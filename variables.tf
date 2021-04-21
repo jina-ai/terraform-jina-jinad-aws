@@ -14,7 +14,7 @@ variable "availability_zone" {
   default     = "us-east-1a"
 }
 
-variable "ebs" {
+variable "disk" {
   description = <<EOT
     Mention the settings of EBS which is attached to instance
     EOT
@@ -35,7 +35,7 @@ variable "instances" {
   default = {
     instance1 = {
       type = "t2.micro"
-      ebs = {
+      disk = {
         type = "gp2"
         size = "20"
       }
@@ -47,7 +47,7 @@ variable "instances" {
     }
     instance2 = {
       type = "t2.micro"
-      ebs = {
+      disk = {
         type = "gp2"
         size = "20"
       }
