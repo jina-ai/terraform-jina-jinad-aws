@@ -227,8 +227,8 @@ resource "aws_ebs_volume" "jinad_ebs_volume" {
   for_each = var.instances
 
   availability_zone = var.availability_zone
-  type = each.value.ebs.type
-  size = each.value.ebs.size
+  type = each.value.disk.type
+  size = each.value.disk.size
 
   tags = var.additional_tags
 }
