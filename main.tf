@@ -7,15 +7,23 @@
  *    source         = "jina-ai/jinad-aws/jina"
  *    version        = "0.0.5"
  *    instances      = {
- *      "encoder": {
- *        "type": "c5.4xlarge",
- *        "pip": [ "tensorflow>=2.0", "transformers>=2.6.0" ],
- *        "command": "sudo apt install -y jq"
+ *      encoder: {
+ *        type: "c5.4xlarge"
+ *        disk = {
+ *          type = "gp2"
+ *          size = "20"
+ *        }
+ *        pip: [ "tensorflow>=2.0", "transformers>=2.6.0" ]
+ *        command: "sudo apt install -y jq"
  *      }
- *      "indexer": {
- *        "type": "i3.2xlarge",
- *        "pip": [ "faiss-cpu==1.6.5", "redis==3.5.3" ],
- *        "command": "sudo apt-get install -y redis-server && sudo redis-server --bind 0.0.0.0 --port 6379:6379 --daemonize yes"
+ *      indexer: {
+ *        type: "i3.2xlarge"
+ *        disk = {
+ *          type = "gp2"
+ *          size = "20"
+ *        }
+ *        pip: [ "faiss-cpu==1.6.5", "redis==3.5.3" ]
+ *        command: "sudo apt-get install -y redis-server && sudo redis-server --bind 0.0.0.0 --port 6379:6379 --daemonize yes"
  *      }
  *    }
  *    vpc_cidr       = "34.121.0.0/24"
@@ -143,6 +151,10 @@ resource "null_resource" "setup_jinad" {
   provisioner "remote-exec" {
     inline = [
       "sudo apt-get update",
+      "sudo mkdir ${var.disk.mount_location}",
+      "sudo mkfs -t ext4 ${var.disk.device_name_renamed}",
+      "sudo mount ${var.disk.device_name_renamed} ${var.disk.mount_location}",
+      "sudo ln -s ${var.disk.mount_location} ${var.disk.jina_home}",
       each.value.command,
       "curl -L https://raw.githubusercontent.com/jina-ai/cloud-ops/master/scripts/deb-systemd.sh > jinad-init.sh",
       "chmod +x jinad-init.sh",
@@ -164,6 +176,7 @@ resource "aws_internet_gateway" "jinad_ig" {
 }
 
 resource "aws_subnet" "jinad_vpc_subnet" {
+  availability_zone = var.availability_zone
   vpc_id     = aws_vpc.jinad_vpc.id
   cidr_block = var.subnet_cidr
   tags       = var.additional_tags
@@ -208,4 +221,23 @@ resource "aws_route_table" "jinad_route_table" {
 resource "aws_route_table_association" "jinad_route_association" {
   subnet_id      = aws_subnet.jinad_vpc_subnet.id
   route_table_id = aws_route_table.jinad_route_table.id
+}
+
+resource "aws_ebs_volume" "jinad_ebs_volume" {
+  for_each = var.instances
+
+  availability_zone = var.availability_zone
+  type = each.value.disk.type
+  size = each.value.disk.size
+
+  tags = var.additional_tags
+}
+
+resource "aws_volume_attachment" "jinad_volume_attachment" {
+  for_each = var.instances
+
+  device_name = var.disk.device_name
+  volume_id = aws_ebs_volume.jinad_ebs_volume[each.key].id
+  instance_id = aws_instance.jinad_instance[each.key].id
+  force_detach = true
 }

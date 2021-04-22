@@ -4,6 +4,12 @@
 module "jinad" {
    source         = "jina-ai/jinad-aws/jina"
    version        = "0.0.5"
+   ebs = {
+     device_name = "/dev/sdh"
+     device_name_renamed = "/dev/xvdh"
+     mount_location = "/mnt/data"
+     jina_home = "/usr/local/jina"
+     }
    instances      = {
      "encoder": {
        "type": "c5.4xlarge",
@@ -68,6 +74,7 @@ with f:
 | Name |
 |------|
 | [aws_ami](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ami) |
+| [aws_ebs_volume](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ebs_volume) |
 | [aws_eip](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eip) |
 | [aws_eip_association](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eip_association) |
 | [aws_instance](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/instance) |
@@ -77,6 +84,7 @@ with f:
 | [aws_security_group](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) |
 | [aws_security_group_rule](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) |
 | [aws_subnet](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) |
+| [aws_volume_attachment](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/volume_attachment) |
 | [aws_vpc](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc) |
 | [null_resource](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) |
 | [random_string](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/string) |
@@ -86,7 +94,9 @@ with f:
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | additional\_tags | Additional resource tags | `map(string)` | `{}` | no |
-| instances | Describe instance configuration here. | `map(any)` | <pre>{<br>  "instance1": {<br>    "command": "sudo echo \"Hello from instance1\"",<br>    "pip": [<br>      "Pillow",<br>      "transformers"<br>    ],<br>    "type": "t2.micro"<br>  },<br>  "instance2": {<br>    "command": "sudo echo \"Hello from instance2\"",<br>    "pip": [<br>      "annoy"<br>    ],<br>    "type": "t2.micro"<br>  }<br>}</pre> | no |
+| availability\_zone | Mention the availability\_zone where JinaD resources are going to get created | `string` | `"us-east-1a"` | no |
+| ebs | Mention the settings of EBS which is attached to instance | `map(any)` | <pre>{<br>  "device_name": "/dev/sdh",<br>  "device_name_renamed": "/dev/xvdh",<br>  "jina_home": "/usr/local/jina",<br>  "mount_location": "/mnt/data"<br>}</pre> | no |
+| instances | Describe instance configuration here. | `map(any)` | <pre>{<br>  "instance1": {<br>    "command": "sudo echo \"Hello from instance1\"",<br>    "ebs": {<br>      "size": "20",<br>      "type": "gp2"<br>    },<br>    "pip": [<br>      "Pillow",<br>      "transformers"<br>    ],<br>    "type": "t2.micro"<br>  },<br>  "instance2": {<br>    "command": "sudo echo \"Hello from instance2\"",<br>    "ebs": {<br>      "size": "20",<br>      "type": "gp2"<br>    },<br>    "pip": [<br>      "annoy"<br>    ],<br>    "type": "t2.micro"<br>  }<br>}</pre> | no |
 | region | Mention the Region where JinaD resources are going to get created | `string` | `"us-east-1"` | no |
 | subnet\_cidr | Mention the CIDR of the subnet | `string` | `"10.113.0.0/16"` | no |
 | vpc\_cidr | Mention the CIDR of the VPC | `string` | `"10.113.0.0/16"` | no |
