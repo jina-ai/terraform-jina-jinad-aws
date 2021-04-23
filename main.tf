@@ -5,7 +5,7 @@
  * ```hcl
  * module "jinad" {
  *    source         = "jina-ai/jinad-aws/jina"
- *    version        = "0.0.5"
+ *    version        = "0.0.6"
  *    instances      = {
  *      encoder: {
  *        type: "c5.4xlarge"
