@@ -159,7 +159,7 @@ resource "null_resource" "setup_jinad" {
       each.value.command,
       "curl -L https://raw.githubusercontent.com/jina-ai/cloud-ops/master/scripts/deb-systemd.sh > jinad-init.sh",
       "chmod +x jinad-init.sh",
-      "sudo bash jinad-init.sh ${join(" ", each.value.pip)}"
+      "sudo bash jinad-init.sh ${join(" ", [for pkg in each.value.pip : "'${pkg}'"])}"
     ]
   }
 }
