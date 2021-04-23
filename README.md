@@ -24,6 +24,7 @@ module "jinad" {
        command: "sudo apt-get install -y redis-server && sudo redis-server --bind 0.0.0.0 --port 6379:6379 --daemonize yes"
      }
    }
+   availability_zone = "us-east-1a"
    vpc_cidr       = "34.121.0.0/24"
    subnet_cidr    = "34.121.0.0/28"
    additional_tags = {
