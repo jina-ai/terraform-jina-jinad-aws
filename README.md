@@ -4,24 +4,27 @@
 module "jinad" {
    source         = "jina-ai/jinad-aws/jina"
    version        = "0.0.5"
-   ebs = {
-     device_name = "/dev/sdh"
-     device_name_renamed = "/dev/xvdh"
-     mount_location = "/mnt/data"
-     jina_home = "/usr/local/jina"
-     }
    instances      = {
-     "encoder": {
-       "type": "c5.4xlarge",
-       "pip": [ "tensorflow>=2.0", "transformers>=2.6.0" ],
-       "command": "sudo apt install -y jq"
+     encoder: {
+       type: "c5.4xlarge"
+       disk = {
+         type = "gp2"
+         size = "20"
+       }
+       pip: [ "tensorflow>=2.0", "transformers>=2.6.0" ]
+       command: "sudo apt install -y jq"
      }
-     "indexer": {
-       "type": "i3.2xlarge",
-       "pip": [ "faiss-cpu==1.6.5", "redis==3.5.3" ],
-       "command": "sudo apt-get install -y redis-server && sudo redis-server --bind 0.0.0.0 --port 6379:6379 --daemonize yes"
+     indexer: {
+       type: "i3.2xlarge"
+       disk = {
+         type = "gp2"
+         size = "20"
+       }
+       pip: [ "faiss-cpu==1.6.5", "redis==3.5.3" ]
+       command: "sudo apt-get install -y redis-server && sudo redis-server --bind 0.0.0.0 --port 6379:6379 --daemonize yes"
      }
    }
+   availability_zone = "us-east-1a"
    vpc_cidr       = "34.121.0.0/24"
    subnet_cidr    = "34.121.0.0/28"
    additional_tags = {
@@ -95,8 +98,8 @@ with f:
 |------|-------------|------|---------|:--------:|
 | additional\_tags | Additional resource tags | `map(string)` | `{}` | no |
 | availability\_zone | Mention the availability\_zone where JinaD resources are going to get created | `string` | `"us-east-1a"` | no |
-| ebs | Mention the settings of EBS which is attached to instance | `map(any)` | <pre>{<br>  "device_name": "/dev/sdh",<br>  "device_name_renamed": "/dev/xvdh",<br>  "jina_home": "/usr/local/jina",<br>  "mount_location": "/mnt/data"<br>}</pre> | no |
-| instances | Describe instance configuration here. | `map(any)` | <pre>{<br>  "instance1": {<br>    "command": "sudo echo \"Hello from instance1\"",<br>    "ebs": {<br>      "size": "20",<br>      "type": "gp2"<br>    },<br>    "pip": [<br>      "Pillow",<br>      "transformers"<br>    ],<br>    "type": "t2.micro"<br>  },<br>  "instance2": {<br>    "command": "sudo echo \"Hello from instance2\"",<br>    "ebs": {<br>      "size": "20",<br>      "type": "gp2"<br>    },<br>    "pip": [<br>      "annoy"<br>    ],<br>    "type": "t2.micro"<br>  }<br>}</pre> | no |
+| disk | Mention the settings of EBS which is attached to instance | `map(any)` | <pre>{<br>  "device_name": "/dev/sdh",<br>  "device_name_renamed": "/dev/xvdh",<br>  "jina_home": "/usr/local/jina",<br>  "mount_location": "/mnt/data"<br>}</pre> | no |
+| instances | Describe instance configuration here. | `map(any)` | <pre>{<br>  "instance1": {<br>    "command": "sudo echo \"Hello from instance1\"",<br>    "disk": {<br>      "size": "20",<br>      "type": "gp2"<br>    },<br>    "pip": [<br>      "Pillow",<br>      "transformers"<br>    ],<br>    "type": "t2.micro"<br>  },<br>  "instance2": {<br>    "command": "sudo echo \"Hello from instance2\"",<br>    "disk": {<br>      "size": "20",<br>      "type": "gp2"<br>    },<br>    "pip": [<br>      "annoy"<br>    ],<br>    "type": "t2.micro"<br>  }<br>}</pre> | no |
 | region | Mention the Region where JinaD resources are going to get created | `string` | `"us-east-1"` | no |
 | subnet\_cidr | Mention the CIDR of the subnet | `string` | `"10.113.0.0/16"` | no |
 | vpc\_cidr | Mention the CIDR of the VPC | `string` | `"10.113.0.0/16"` | no |
