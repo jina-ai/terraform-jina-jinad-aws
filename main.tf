@@ -10,7 +10,7 @@
  *        type: "c5.4xlarge"
  *        disk = {
  *          type = "gp2"
- *          size = "20"
+ *          size = 20
  *        }
  *        pip: [ "tensorflow>=2.0", "transformers>=2.6.0" ]
  *        command: "sudo apt install -y jq"
@@ -19,7 +19,7 @@
  *        type: "i3.2xlarge"
  *        disk = {
  *          type = "gp2"
- *          size = "20"
+ *          size = 20
  *        }
  *        pip: [ "faiss-cpu==1.6.5", "redis==3.5.3" ]
  *        command: "sudo apt-get install -y redis-server && sudo redis-server --bind 0.0.0.0 --port 6379:6379 --daemonize yes"
@@ -113,6 +113,16 @@ resource "aws_instance" "jinad_instance" {
   vpc_security_group_ids = [aws_security_group.jinad_sg.id]
   subnet_id              = aws_subnet.jinad_vpc_subnet.id
   key_name               = module.keypair.key_name
+  root_block_device {
+    volume_size = lookup(each.value.disk, "size", 20)
+    volume_type = lookup(each.value.disk, "type", "gp2")
+    tags = merge(
+      var.additional_tags,
+      {
+        "Name" = each.key
+      },
+    )
+  }
   tags = merge(
     var.additional_tags,
     {
@@ -221,23 +231,4 @@ resource "aws_route_table" "jinad_route_table" {
 resource "aws_route_table_association" "jinad_route_association" {
   subnet_id      = aws_subnet.jinad_vpc_subnet.id
   route_table_id = aws_route_table.jinad_route_table.id
-}
-
-resource "aws_ebs_volume" "jinad_ebs_volume" {
-  for_each = var.instances
-
-  availability_zone = var.availability_zone
-  type = each.value.disk.type
-  size = each.value.disk.size
-
-  tags = var.additional_tags
-}
-
-resource "aws_volume_attachment" "jinad_volume_attachment" {
-  for_each = var.instances
-
-  device_name = var.disk.device_name
-  volume_id = aws_ebs_volume.jinad_ebs_volume[each.key].id
-  instance_id = aws_instance.jinad_instance[each.key].id
-  force_detach = true
 }

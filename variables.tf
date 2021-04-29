@@ -14,19 +14,6 @@ variable "availability_zone" {
   default     = "us-east-1a"
 }
 
-variable "disk" {
-  description = <<EOT
-    Mention the settings of EBS which is attached to instance
-    EOT
-  type = map(any)
-  default = {
-    device_name = "/dev/sdh"
-    device_name_renamed = "/dev/xvdh"
-    mount_location = "/mnt/data"
-    jina_home = "/usr/local/jina"
-  }
-}
-
 variable "instances" {
   description = <<EOT
     Describe instance configuration here.
@@ -37,7 +24,7 @@ variable "instances" {
       type = "t2.micro"
       disk = {
         type = "gp2"
-        size = "20"
+        size = 50
       }
       pip = [
         "Pillow",
@@ -49,7 +36,7 @@ variable "instances" {
       type = "t2.micro"
       disk = {
         type = "gp2"
-        size = "20"
+        size = 20
       }
       pip = [
         "annoy",
