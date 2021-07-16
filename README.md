@@ -3,6 +3,10 @@
 ```hcl
 module "jinad" {
    source         = "jina-ai/jinad-aws/jina"
+   debug          = "true"
+   branch         = "master"
+   port           = "8000"
+   script         = "setup-jinad.sh"
    instances      = {
      encoder: {
        type: "c5.4xlarge"
@@ -10,7 +14,6 @@ module "jinad" {
          type = "gp2"
          size = 20
        }
-       pip: [ "tensorflow>=2.0", "transformers>=2.6.0" ]
        command: "sudo apt install -y jq"
      }
      indexer: {
@@ -19,13 +22,10 @@ module "jinad" {
          type = "gp2"
          size = 20
        }
-       pip: [ "faiss-cpu==1.6.5", "redis==3.5.3" ]
        command: "sudo apt-get install -y redis-server && sudo redis-server --bind 0.0.0.0 --port 6379:6379 --daemonize yes"
      }
    }
    availability_zone = "us-east-1a"
-   vpc_cidr       = "34.121.0.0/24"
-   subnet_cidr    = "34.121.0.0/28"
    additional_tags = {
      "my_tag_key" = "my_tag_value"
    }
@@ -55,13 +55,13 @@ with f:
 
 | Name | Version |
 |------|---------|
-| aws | ~> 3.27 |
+| aws | =3.37 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| aws | ~> 3.27 |
+| aws | =3.37 |
 | null | n/a |
 | random | n/a |
 
@@ -75,17 +75,17 @@ with f:
 
 | Name |
 |------|
-| [aws_ami](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ami) |
-| [aws_eip](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eip) |
-| [aws_eip_association](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eip_association) |
-| [aws_instance](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/instance) |
-| [aws_internet_gateway](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/internet_gateway) |
-| [aws_route_table](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table) |
-| [aws_route_table_association](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table_association) |
-| [aws_security_group](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) |
-| [aws_security_group_rule](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) |
-| [aws_subnet](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) |
-| [aws_vpc](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc) |
+| [aws_ami](https://registry.terraform.io/providers/hashicorp/aws/3.37/docs/data-sources/ami) |
+| [aws_eip](https://registry.terraform.io/providers/hashicorp/aws/3.37/docs/resources/eip) |
+| [aws_eip_association](https://registry.terraform.io/providers/hashicorp/aws/3.37/docs/resources/eip_association) |
+| [aws_instance](https://registry.terraform.io/providers/hashicorp/aws/3.37/docs/resources/instance) |
+| [aws_internet_gateway](https://registry.terraform.io/providers/hashicorp/aws/3.37/docs/resources/internet_gateway) |
+| [aws_route_table](https://registry.terraform.io/providers/hashicorp/aws/3.37/docs/resources/route_table) |
+| [aws_route_table_association](https://registry.terraform.io/providers/hashicorp/aws/3.37/docs/resources/route_table_association) |
+| [aws_security_group](https://registry.terraform.io/providers/hashicorp/aws/3.37/docs/resources/security_group) |
+| [aws_security_group_rule](https://registry.terraform.io/providers/hashicorp/aws/3.37/docs/resources/security_group_rule) |
+| [aws_subnet](https://registry.terraform.io/providers/hashicorp/aws/3.37/docs/resources/subnet) |
+| [aws_vpc](https://registry.terraform.io/providers/hashicorp/aws/3.37/docs/resources/vpc) |
 | [null_resource](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) |
 | [random_string](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/string) |
 
@@ -95,8 +95,13 @@ with f:
 |------|-------------|------|---------|:--------:|
 | additional\_tags | Additional resource tags | `map(string)` | `{}` | no |
 | availability\_zone | Mention the availability\_zone where JinaD resources are going to get created | `string` | `"us-east-1a"` | no |
-| instances | Describe instance configuration here. | `map(any)` | <pre>{<br>  "instance1": {<br>    "command": "sudo echo \"Hello from instance1\"",<br>    "disk": {<br>      "size": 50,<br>      "type": "gp2"<br>    },<br>    "pip": [<br>      "Pillow",<br>      "transformers"<br>    ],<br>    "type": "t2.micro"<br>  },<br>  "instance2": {<br>    "command": "sudo echo \"Hello from instance2\"",<br>    "disk": {<br>      "size": 20,<br>      "type": "gp2"<br>    },<br>    "pip": [<br>      "annoy"<br>    ],<br>    "type": "t2.micro"<br>  }<br>}</pre> | no |
+| branch | Mention the git-branch of jina repo to be built | `string` | `"master"` | no |
+| debug | True if this is running for testing | `bool` | `true` | no |
+| instances | Describe instance configuration here. | `map(any)` | <pre>{<br>  "instance1": {<br>    "command": "sudo echo \"Hello from instance1\"",<br>    "disk": {<br>      "size": 50,<br>      "type": "gp2"<br>    },<br>    "type": "t2.micro"<br>  },<br>  "instance2": {<br>    "command": "sudo echo \"Hello from instance2\"",<br>    "disk": {<br>      "size": 20,<br>      "type": "gp2"<br>    },<br>    "type": "t2.micro"<br>  }<br>}</pre> | no |
+| jina\_version | Mention the version of jinad to be pulled from docker hub<br>    This is applicable only if debug is set to false | `string` | `"latest"` | no |
+| port | Mention the jinad port to be mapped on host | `string` | `"8000"` | no |
 | region | Mention the Region where JinaD resources are going to get created | `string` | `"us-east-1"` | no |
+| scriptpath | jinad setup script path (part of jina codebase) | `string` | n/a | yes |
 | subnet\_cidr | Mention the CIDR of the subnet | `string` | `"10.113.0.0/16"` | no |
 | vpc\_cidr | Mention the CIDR of the VPC | `string` | `"10.113.0.0/16"` | no |
 
