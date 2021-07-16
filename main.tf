@@ -5,6 +5,10 @@
  * ```hcl
  * module "jinad" {
  *    source         = "jina-ai/jinad-aws/jina"
+ *    debug          = "true"
+ *    branch         = "master"
+ *    port           = "8000"
+ *    script         = "setup-jinad.sh"
  *    instances      = {
  *      encoder: {
  *        type: "c5.4xlarge"
@@ -12,7 +16,6 @@
  *          type = "gp2"
  *          size = 20
  *        }
- *        pip: [ "tensorflow>=2.0", "transformers>=2.6.0" ]
  *        command: "sudo apt install -y jq"
  *      }
  *      indexer: {
@@ -21,13 +24,10 @@
  *          type = "gp2"
  *          size = 20
  *        }
- *        pip: [ "faiss-cpu==1.6.5", "redis==3.5.3" ]
  *        command: "sudo apt-get install -y redis-server && sudo redis-server --bind 0.0.0.0 --port 6379:6379 --daemonize yes"
  *      }
  *    }
  *    availability_zone = "us-east-1a"
- *    vpc_cidr       = "34.121.0.0/24"
- *    subnet_cidr    = "34.121.0.0/28"
  *    additional_tags = {
  *      "my_tag_key" = "my_tag_value"
  *    }
@@ -104,11 +104,17 @@ data "aws_ami" "ubuntu" {
   owners = ["099720109477"] # Canonical
 }
 
+locals {
+  debug        = (var.debug ? "--debug" : " ")
+  branch       = (var.branch != "" ? var.branch : "master")
+  port         = (var.port != "" ? var.port : "8000")
+  jina_version = (var.jina_version != "" ? var.jina_version : "latest")
+}
 
 resource "aws_instance" "jinad_instance" {
   for_each = var.instances
 
-  ami                    = data.aws_ami.ubuntu.id
+  ami                    = "ami-0747d73950dfc9ba3" # jinad-base image with docker setup for ubuntu user
   instance_type          = each.value.type
   vpc_security_group_ids = [aws_security_group.jinad_sg.id]
   subnet_id              = aws_subnet.jinad_vpc_subnet.id
@@ -147,7 +153,6 @@ resource "aws_eip_association" "jinad_ip_association" {
   allocation_id = aws_eip.jinad_ip[each.key].id
 }
 
-
 resource "null_resource" "setup_jinad" {
   for_each = var.instances
 
@@ -158,13 +163,16 @@ resource "null_resource" "setup_jinad" {
     private_key = module.keypair.private_key_pem
   }
 
+  provisioner "file" {
+    source      = var.scriptpath
+    destination = "/tmp/script.sh"
+  }
+
   provisioner "remote-exec" {
     inline = [
       "sudo apt-get update",
-      each.value.command,
-      "curl -L https://raw.githubusercontent.com/jina-ai/cloud-ops/master/scripts/deb-systemd.sh > jinad-init.sh",
-      "chmod +x jinad-init.sh",
-      "sudo bash jinad-init.sh ${join(" ", [for pkg in each.value.pip : "'${pkg}'"])}"
+      "chmod +x /tmp/script.sh",
+      "/tmp/script.sh ${local.debug} --branch ${local.branch} --port ${local.port} --version ${local.jina_version}",
     ]
   }
 }
@@ -183,9 +191,9 @@ resource "aws_internet_gateway" "jinad_ig" {
 
 resource "aws_subnet" "jinad_vpc_subnet" {
   availability_zone = var.availability_zone
-  vpc_id     = aws_vpc.jinad_vpc.id
-  cidr_block = var.subnet_cidr
-  tags       = var.additional_tags
+  vpc_id            = aws_vpc.jinad_vpc.id
+  cidr_block        = var.subnet_cidr
+  tags              = var.additional_tags
 }
 
 resource "aws_security_group" "jinad_sg" {

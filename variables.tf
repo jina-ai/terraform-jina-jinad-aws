@@ -26,10 +26,6 @@ variable "instances" {
         type = "gp2"
         size = 50
       }
-      pip = [
-        "Pillow",
-        "transformers"
-      ]
       command = "sudo echo \"Hello from instance1\""
     }
     instance2 = {
@@ -38,9 +34,6 @@ variable "instances" {
         type = "gp2"
         size = 20
       }
-      pip = [
-        "annoy",
-      ]
       command = "sudo echo \"Hello from instance2\""
     },
   }
@@ -68,4 +61,44 @@ variable "additional_tags" {
     Additional resource tags
     EOT
   type        = map(string)
+}
+
+variable "scriptpath" {
+  description = <<EOT
+    jinad setup script path (part of jina codebase)
+    EOT
+  type        = string
+}
+
+variable "debug" {
+  default     = true
+  description = <<EOT
+    True if this is running for testing
+    EOT
+  type        = bool
+}
+
+variable "branch" {
+  description = <<EOT
+    Mention the git-branch of jina repo to be built
+    EOT
+  type        = string
+  default     = "master"
+}
+
+variable "port" {
+  description = <<EOT
+    Mention the jinad port to be mapped on host
+    EOT
+  type        = string
+  default     = "8000"
+}
+
+variable "jina_version" {
+  description = <<EOT
+    Mention the version of jinad to be pulled from docker hub
+    This is applicable only if debug is set to false
+    EOT
+  type        = string
+  default     = "latest"
 }
