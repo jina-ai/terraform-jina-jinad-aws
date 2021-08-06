@@ -170,7 +170,7 @@ resource "null_resource" "setup_jinad" {
 
   provisioner "remote-exec" {
     inline = [
-      "sudo apt-get update",
+      # "sudo apt-get update",
       "chmod +x /tmp/script.sh",
       "/tmp/script.sh ${local.debug} --branch ${local.branch} --port ${local.port} --version ${local.jina_version}",
     ]
