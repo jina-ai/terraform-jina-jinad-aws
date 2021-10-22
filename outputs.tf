@@ -1,15 +1,14 @@
-output "instance_ips" {
-  description = <<EOT
-    Elastic IPs of JinaD instances created as a map
-    EOT
-  value       = { for jinad in sort(keys(var.instances)) : jinad => aws_eip.jinad_ip[jinad].public_ip }
-}
+# output "instance_ips" {
+#   description = <<EOT
+#     Elastic IPs of JinaD instances created as a map
+#     EOT
+#   value       = { for jinad in sort(keys(var.instances)) : jinad => aws_eip.jinad_ip[jinad].public_ip }
+# }
 
 
-output "instance_keys" {
+output "asg_id" {
   description = <<EOT
-    Private key of JinaD instances for debugging
+    ID of the Autoscaling group
     EOT
-  value       = module.keypair.private_key_pem
-  sensitive   = true
+  value       = aws_autoscaling_group.jinad_asg.id
 }
