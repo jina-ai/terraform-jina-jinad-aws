@@ -45,8 +45,14 @@ resource "aws_security_group_rule" "jinad_sg_e_rule" {
   cidr_blocks       = ["0.0.0.0/0"]
 }
 
+resource "random_string" "random_chars" {
+  length           = 6
+  special          = true
+  override_special = "_"
+}
+
 resource "aws_launch_template" "jinad_template" {
-  name = "jinad_template"
+  name = "jinad_template-${random_string.random_chars.result}"
   block_device_mappings {
     device_name = "/dev/sda1"
     ebs {
